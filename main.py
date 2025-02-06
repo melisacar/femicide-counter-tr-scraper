@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-import pandas as pd
 
 BASE_URL = "https://anitsayac.com/"
 
@@ -67,9 +66,8 @@ def get_details(details_url):
 
     return details
 
-all_victims_data = []
 # Fetching the data for both 2024 and 2025
-for year in range[2025, 2007, -1]:
+for year in [2024, 2025]:
     print(f"Fetching data for {year}...")
     victims = get_names_and_links(year)
 
@@ -79,20 +77,8 @@ for year in range[2025, 2007, -1]:
         details = get_details(victim["details_url"])  # Fetch the details
         victim.update(details)  # Add the details to the main data
 
-    # Add the victim's year to the data
-        victim['year'] = year
-
-        # Store the victim's data in the list
-        all_victims_data.append(victim)
-
         # Printing all the details
-        #for key, value in details.items():
-            #print(f"{key}: {value}")
-        #print("="*50)  # Adding a separator line
+        for key, value in details.items():
+            print(f"{key}: {value}")
+        print("="*50)  # Adding a separator line
         #time.sleep(1)  # Wait for one second per request
-
-df = pd.DataFrame(all_victims_data)
-excel_filename = "femicide_data_2025_to_2008.xlsx"
-df.to_excel(excel_filename, index=False, engine ="openpyxl")
-
-print(f"Data saved to {excel_filename}")
