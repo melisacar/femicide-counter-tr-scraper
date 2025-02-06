@@ -23,5 +23,5 @@ def get_names_and_links(year):
     return names_data
     
 output = get_names_and_links(YEAR)
-#print(output)
-#print(len(output))
+print(output)
+print(len(output))
