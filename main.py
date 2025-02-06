@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import pandas as pd
 
 BASE_URL = "https://anitsayac.com/"
 
@@ -12,8 +13,14 @@ def get_names_and_links(year):
     soup = BeautifulSoup(response.text, "html.parser")
     names_data = []
 
+    # Set the class name depending on the year
+    if year == 2025:
+        class_name = "xxy bgyear2025"
+    else:
+        class_name = "xxy"  # For all years other than 2025
+
     # Getting the names of the victims and the links to their detail pages
-    names_spans = soup.find_all("span", class_="xxy bgyear2025")
+    names_spans = soup.find_all("span", class_=class_name)
 
     for span in names_spans:
         link_tag = span.find("a")
@@ -60,18 +67,32 @@ def get_details(details_url):
 
     return details
 
-# Fetching the data
-year = 2025
-victims = get_names_and_links(year)
+all_victims_data = []
+# Fetching the data for both 2024 and 2025
+for year in range[2025, 2007, -1]:
+    print(f"Fetching data for {year}...")
+    victims = get_names_and_links(year)
 
-# Fetching details for each victim
-for victim in victims:
-    print(f"\nFetching details for: {victim['name']} at {victim['details_url']}")
-    details = get_details(victim["details_url"])  # Fetch the details
-    victim.update(details)  # Add the details to the main data
+    # Fetching details for each victim
+    for victim in victims:
+        print(f"\nFetching details for: {victim['name']} at {victim['details_url']}")
+        details = get_details(victim["details_url"])  # Fetch the details
+        victim.update(details)  # Add the details to the main data
 
-    # Printing all the details
-    for key, value in details.items():
-        print(f"{key}: {value}")
-    print("="*50)  # Adding a separator line
-    #time.sleep(1)  # Wait for one second per request
+    # Add the victim's year to the data
+        victim['year'] = year
+
+        # Store the victim's data in the list
+        all_victims_data.append(victim)
+
+        # Printing all the details
+        #for key, value in details.items():
+            #print(f"{key}: {value}")
+        #print("="*50)  # Adding a separator line
+        #time.sleep(1)  # Wait for one second per request
+
+df = pd.DataFrame(all_victims_data)
+excel_filename = "femicide_data_2025_to_2008.xlsx"
+df.to_excel(excel_filename, index=False, engine ="openpyxl")
+
+print(f"Data saved to {excel_filename}")
