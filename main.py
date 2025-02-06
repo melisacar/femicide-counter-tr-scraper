@@ -86,6 +86,7 @@ def fetch_and_save_data():
                 victim.update(details)  # Add the details to the main data
                 victim['Yıl'] = year  # Add the year to the data
                 all_victims_data.append(victim)  # Store the victim's data in the list
+        print(f"Year {year} is done.")
 
     # Convert to DataFrame
     df = pd.DataFrame(all_victims_data)
