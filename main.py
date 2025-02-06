@@ -3,16 +3,16 @@ from bs4 import BeautifulSoup
 import time
 
 BASE_URL = "https://anitsayac.com/"
-YEAR = 2025
 
 def get_names_and_links(year):
-    url = f"{BASE_URL}?year={YEAR}"
+    url = f"{BASE_URL}?year={year}"
     response = requests.get(url)
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
     names_data = []
 
+    # Getting the names of the victims and the links to their detail pages
     names_spans = soup.find_all("span", class_="xxy bgyear2025")
 
     for span in names_spans:
@@ -29,29 +29,49 @@ def get_details(details_url):
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    print(f"Page content for {details_url}:\n")
-    print(soup.prettify())  
-
     details = {}
-    detail_rows = soup.find_all("tr")
 
-    for row in detail_rows:
-        columns = row.find_all("td")
-        if len(columns) == 2:
-            key = columns[0].text.strip().replace(":", "")
-            value = columns[1].text.strip()
-            details[key] = value
+    # Finding all <b> tags on the page
+    b_tags = soup.find_all("b")
+
+    for b_tag in b_tags:
+        # Getting the text after each <b> tag
+        label = b_tag.text.strip()
+
+        # Getting the text and tags after the label
+        next_node = b_tag.find_next_sibling(text=True)
+        if next_node:
+            value = next_node.strip()
+        else:
+            # If there is no text, there may be other tags containing text
+            value = b_tag.find_next_sibling().get_text(strip=True) if b_tag.find_next_sibling() else "No information"
+        label = label.replace(":", "")  # Removing ':' character
+
+        # If the value is empty, we set it as "No information"
+        if not value:
+            value = "No information"
+
+        details[label] = value
+
+    # Getting the source information (if available)
+    source_tag = soup.find("a", href=True)
+    if source_tag:
+        details["Kaynak"] = source_tag["href"]
+
     return details
 
-victims = get_names_and_links(YEAR)
+# Fetching the data
+year = 2025
+victims = get_names_and_links(year)
 
+# Fetching details for each victim
 for victim in victims:
     print(f"\nFetching details for: {victim['name']} at {victim['details_url']}")
-    details = get_details(victim["details_url"])  
-    victim.update(details)  
+    details = get_details(victim["details_url"])  # Fetch the details
+    victim.update(details)  # Add the details to the main data
 
-    # Tüm detayları yazdır
+    # Printing all the details
     for key, value in details.items():
         print(f"{key}: {value}")
-    print("="*50)  
-    time.sleep(1)  
+    print("="*50)  # Adding a separator line
+    #time.sleep(1)  # Wait for one second per request
