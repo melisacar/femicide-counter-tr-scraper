@@ -6,11 +6,12 @@ This project scrapes data from the [AnitSayac](https://anitsayac.com/) website a
 
 To run this project, the following Python libraries are required:
 
-- requests: To make HTTP requests
-- BeautifulSoup: For HTML parsing
-- pandas: To process and save the data into an Excel file
-- concurrent.futures: For parallel processing
-- re: For using regular expressions (regex) to clean text
+- `requests`: To make HTTP requests
+- `BeautifulSoup`: For HTML parsing
+- `pandas`: To process and save the data into an Excel file
+- `concurrent.futures`: For parallel processing
+- `re`: For using regular expressions (regex) to clean text
+- `openpyxl`: To write Excel files
 
 You can install the necessary libraries using the following command:
 
