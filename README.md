@@ -1,6 +1,6 @@
 # Femicide Counter (Türkiye)
 
-This project scrapes data from the [AnitSayac](https://anitsayac.com/) website and saves it into an Excel file. Users can access the data for a specific year and gather detailed information about each data entry.
+This project scrapes data from the [AnitSayac](https://anitsayac.com/) website and saves it into an Excel file. Users can access the data for a specific year and gather detailed information about each data entry. The data collection process is implemented in Python, and parallel processing is used to speed up the data retrieval.
 
 ## Requirements
 
