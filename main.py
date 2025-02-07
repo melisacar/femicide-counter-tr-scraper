@@ -8,14 +8,13 @@ import time
 BASE_URL = "https://anitsayac.com/"
 
 def sanitize_text(text):
-    """Metindeki illegal karakterleri temizler ve string olarak döndürür."""
     if not isinstance(text, str):  
         text = str(text)  
     return re.sub(r'[\x00-\x1F\x7F]', '', text)
 
 def get_names_and_links(year):
     url = f"{BASE_URL}?year={year}"
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -36,12 +35,10 @@ def get_names_and_links(year):
 
 def get_details(details_url):
     headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9,tr;q=0.8", 
-    "Connection": "keep-alive",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
 }
 
-    response = requests.get(details_url, headers=headers)
+    response = requests.get(details_url, headers=headers, verify=False)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -75,7 +72,7 @@ def get_details(details_url):
 def fetch_and_save_data():
     all_victims_data = []
 
-    for year in [2025]:
+    for year in [2024]:
         victims = get_names_and_links(year)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -86,21 +83,20 @@ def fetch_and_save_data():
                 try:
                     details = future.result()
                     victim.update(details)
-                    victim['Yıl'] = year
 
                     victim = {key: sanitize_text(value) for key, value in victim.items()}
                     all_victims_data.append(victim)
 
                 except Exception as e:
-                    print(f"Hata oluştu: {victim['Detay URL']} - {e}")
+                    print(f"Error: {victim['Detay URL']} - {e}")
 
-        print(f"{year} yılı tamamlandı.")
+        print(f"{year} is done.")
 
     df = pd.DataFrame(all_victims_data)
 
-    excel_filename = "asd.xlsx"
+    excel_filename = "femicide_data_2025_to_2008.xlsx"
     df.to_excel(excel_filename, index=False, engine="openpyxl")
 
-    print(f"Veriler {excel_filename} dosyasına kaydedildi.")
+    print(f"Saved to {excel_filename}.")
 
 fetch_and_save_data()
